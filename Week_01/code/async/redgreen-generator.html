@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Red Green - async</title>
+    <title>Red Green - generator</title>
 </head>
 <style>
     div {
@@ -62,16 +62,34 @@
         });
     }
 
-    async function go() {
+    function* go() {
         while(true){
             green();
-            await sleep(1000);
+            yield sleep(1000);
             yellow();
-            await sleep(200);
+            yield sleep(200);
             red();
-            await sleep(500);
+            yield sleep(500);
         }
     }
+
+    function run(iterator){
+        let {value, done} = iterator.next();
+        if(done) return;
+        if(value instanceof Promise){
+            value.then(function(){
+                run(iterator);
+            });
+        }
+    }
+
+    function co(generator){
+        return function(){
+            return run(generator());
+        }
+    }
+
+    go = co(go);
 
     go();
 </script>
