@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Red Green - callback</title>
+</head>
+<style>
+    div {
+        background-color: grey;
+        display: inline-block;
+        margin: 30px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+    }
+
+    .green.light {
+        background-color: green;
+    }
+
+    .yellow.light {
+        background-color: yellow;
+    }
+
+    .red.light {
+        background-color: red;
+    }
+</style>
+<body>
+<div class="green"></div>
+<div class="yellow"></div>
+<div class="red"></div>
+
+<script>
+    function green() {
+        var lights = document.getElementsByTagName('div');
+        for (var i = 0; i < 3; i++) {
+            lights[i].classList.remove('light');
+        }
+        document.getElementsByClassName('green')[0].classList.add('light');
+    }
+
+    function red() {
+        var lights = document.getElementsByTagName('div');
+        for (var i = 0; i < 3; i++) {
+            lights[i].classList.remove('light');
+        }
+        document.getElementsByClassName('red')[0].classList.add('light');
+    }
+
+    function yellow() {
+        var lights = document.getElementsByTagName('div');
+        for (var i = 0; i < 3; i++) {
+            lights[i].classList.remove('light');
+        }
+        document.getElementsByClassName('yellow')[0].classList.add('light');
+    }
+
+    function go() {
+        green(); // 执行green - 绿灯亮
+        setTimeout(function () {
+            yellow(); // 执行 yellow - 黄灯亮
+            setTimeout(function () {
+                red(); // 执行 red - 红灯亮
+                setTimeout(function () {
+                    go(); // 执行 go - 重新开始
+                }, 500); // 0.5s后执行
+            }, 200); // 0.2s后执行
+        }, 1000); // 1s后执行
+    }
+
+    go();
+</script>
+</body>
+</html>
