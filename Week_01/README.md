@@ -163,3 +163,6 @@ async function go() {
     go = co(go);
 ```
 因属于没有Promise时的一种polyfill，所以不需要特别掌握。
+
+## 知识脑图
+![Promise脑图](https://github.com/KamikidFu/Frontend-09-Template/blob/main/Week_01/Promise脑图.png) 
