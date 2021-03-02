@@ -64,39 +64,61 @@
     document.addEventListener("mouseup", () => mousedown = false);
     document.addEventListener("contextmenu", e => e.preventDefault());
 
+    /**
+     * To find a path from given start point to end point
+     * @param map - map graph
+     * @param start - path start point
+     * @param end - expected end point
+     * @returns {boolean} - whether found a path or not
+     */
     function path(map, start, end) {
-        var queue = [start];
+        var queue = [start]; // Use queue - first in first out pattern - BFS
+        // var stack = [start]; // Use stack - first in last out pattern - DFS
 
+        /**
+         * Helper method to insert a point into queue
+         * @param x - x value
+         * @param y - y value
+         */
         function insert(x, y) {
+            // Check if out of boundary
             if (x < 0 || x >= 100 || y < 0 || y >= 100) {
                 return;
             }
+            // Check if already visited or a wall
+            // value 0 is false, which mean unvisited yet
             if (map[y * 100 + x]) {
                 return;
             }
 
-            map[y * 100 + x] = 2;
-            queue.push([x, y]);
+            map[y * 100 + x] = 2; // available point to search, set flag as 2
+            queue.push([x, y]); // push into queue
+            // stack.push([x, y]);
         }
 
-        while(queue.length){
-            let [x,y]=queue.shift();
+        // Loop through whole queue
+        while (queue.length /*stack.length*/) {
+            // Shift out a point to verify
+            let [x, y] = queue.shift();
+            // let [x, y] = stack.pop();
             console.log(x, y);
-            if(x === end[0] && y=== end[1]){
+            if (x === end[0] && y === end[1]) {
                 return true;
             }
 
-            insert(x-1, y);
-            insert(x, y-1);
-            insert(x+1, y);
-            insert(x,y+1);
+            // Insert points around current point for following searches
+            insert(x - 1, y);
+            insert(x, y - 1);
+            insert(x + 1, y);
+            insert(x, y + 1);
 
-            insert(x+1,y+1);
-            insert(x+1,y-1);
-            insert(x-1,y-1);
-            insert(x-1,y+1);
+            insert(x + 1, y + 1);
+            insert(x + 1, y - 1);
+            insert(x - 1, y - 1);
+            insert(x - 1, y + 1);
         }
 
+        // If queue turns empty, which mean cannot access to end point, so return false
         return false;
     }
 </script>
