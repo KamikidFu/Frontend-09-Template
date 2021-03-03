@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Step-6</title>
+</head>
+<body>
+<style>
+    .cell {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: gray;
+        border-bottom: solid 1px white;
+        border-right: solid 1px white;
+        vertical-align: top;
+    }
+
+    #container {
+        width: 701px;
+        line-height: 1px;
+    }
+</style>
+
+<div id="container"></div>
+<button onclick="localStorage['map'] = JSON.stringify(map)">save</button>
+
+<script>
+
+    class Sorted {
+        constructor(data, compareFn) {
+            this.data = data.slice();
+            this.compare = compareFn || ((a, b) => a - b);
+        }
+
+        take() {
+            if (!this.data.length) {
+                return;
+            }
+            let min = this.data[0];
+            let minIdx = 0;
+
+            for (let i = 1; i < this.data.length; i++) {
+                if (this.compare(this.data[i], min) < 0) {
+                    min = this.data[i];
+                    minIdx = i;
+                }
+            }
+
+            this.data[minIdx] = this.data[this.data.length - 1];
+            this.data.pop();
+            return min;
+        }
+
+        give(v) {
+            this.data.push(v);
+        }
+    }
+
+
+    let mousedown = false;
+    let clear = false;
+
+    let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(10000).fill(0);
+
+    let container = document.getElementById('container');
+
+    for (let y = 0; y < 100; y++) {
+        for (let x = 0; x < 100; x++) {
+            let cell = document.createElement('div');
+            cell.classList.add('cell');
+
+            if (map[100 * y + x] === 1) {
+                cell.style.backgroundColor = 'black';
+            }
+
+            cell.addEventListener("mousemove", () => {
+                if (mousedown) {
+                    if (clear) {
+                        cell.style.backgroundColor = "";
+                        map[100 * y + x] = 0;
+                    } else {
+                        cell.style.backgroundColor = "black";
+                        map[100 * y + x] = 1;
+                    }
+                }
+            });
+            container.appendChild(cell);
+        }
+    }
+
+    document.addEventListener("mousedown", e => {
+        mousedown = true;
+        clear = (e.button === 2); //.which is non-standard, so use .button
+    });
+    document.addEventListener("mouseup", () => mousedown = false);
+    document.addEventListener("contextmenu", e => e.preventDefault());
+
+    function sleep(t) {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, t);
+        });
+    }
+
+    /**
+     * To find a path from given start point to end point
+     * @param map - map graph
+     * @param start - path start point
+     * @param end - expected end point
+     * @returns {boolean} - whether found a path or not
+     */
+    async function findPath(map, start, end) {
+        let table = Object.create(map);
+        let queue = new Sorted([start], (a, b) => distance(a) - distance(b));
+
+        /**
+         * Helper method to insert a point into queue
+         * @param x - x value
+         * @param y - y value
+         * @param pre - Previous point visited
+         */
+        async function insert(x, y, pre) {
+            // Check if out of boundary
+            if (x < 0 || x >= 100 || y < 0 || y >= 100) {
+                return;
+            }
+            // Check if already visited or a wall
+            // value 0 is false, which mean unvisited yet
+            if (map[y * 100 + x]) {
+                return;
+            }
+
+            map[y * 100 + x] = 2; // available point to search, set flag as 2
+            container.children[y * 100 + x].style.backgroundColor = "lightgreen";
+            table[y * 100 + x] = pre;
+            queue.give([x, y]); // push into queue
+        }
+
+        function distance(point) {
+            return (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2;
+        }
+
+        // Loop through whole queue
+        while (queue.data.length) {
+            // Shift out a point to verify
+            let [x, y] = queue.take();
+            console.log(x, y);
+            if (x === end[0] && y === end[1]) {
+                let path = [];
+
+                while (x !== start[0] || y !== start[1]) {
+                    path.push(map[y * 100 + x]);
+                    [x, y] = table[y * 100 + x];
+                    await sleep(20);
+                    container.children[y * 100 + x].style.backgroundColor = "purple";
+                }
+
+                return path;
+            }
+
+            // Insert points around current point for following searches
+            await insert(x - 1, y, [x, y]);
+            await insert(x, y - 1, [x, y]);
+            await insert(x + 1, y, [x, y]);
+            await insert(x, y + 1, [x, y]);
+
+            await insert(x + 1, y + 1, [x, y]);
+            await insert(x + 1, y - 1, [x, y]);
+            await insert(x - 1, y - 1, [x, y]);
+            await insert(x - 1, y + 1, [x, y]);
+        }
+
+        // If queue turns empty, which mean cannot access to end point, so return null
+        return null;
+    }
+</script>
+
+</body>
+</html>
