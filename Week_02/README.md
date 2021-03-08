@@ -100,7 +100,7 @@ document.addEventListener("contextmenu", e => e.preventDefault());
 * 向地图中标记该访问点  
 * 向可访问点数据结构中添加该访问点
 
-`findPath(map, start, end)`
+`findPath(map, start, end)`  
 寻路方法，`map`为当前地图，记录可访问点与障碍。`start`和`end`分别记录寻路起始位置以及终结位置。
 * 向可访问点数据结构中标记起点`start`
 * 循环，但凡可访问点中存在访问点
