@@ -49,7 +49,47 @@ function Expression(tokens) {
 }
 
 function AdditiveExpression(source) {
+    if (source[0].type === ExpressionLabel.MultiplicativeExpression) {
+        let node = {
+            type: ExpressionLabel.AdditiveExpression,
+            children: [source[0]]
+        }
+        source[0] = node;
+        return AdditiveExpression(source);
+    }
+    if (source[0].type === ExpressionLabel.AdditiveExpression
+        && source[1] && source[1].type === "+") {
+        let node = {
+            type: ExpressionLabel.AdditiveExpression,
+            operator: "+",
+            children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        MultiplicativeExpression(source);
+        node.children.push(source.shift());
+        source.unshift(node);
+        return AdditiveExpression(source);
+    }
+    if (source[0].type === ExpressionLabel.AdditiveExpression
+        && source[1] && source[1].type === "-") {
+        let node = {
+            type: ExpressionLabel.AdditiveExpression,
+            operator: "-",
+            children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        MultiplicativeExpression(source);
+        node.children.push(source.shift());
+        source.unshift(node);
+        return AdditiveExpression(source);
+    }
+    if (source[0].type === ExpressionLabel.AdditiveExpression) {
+        return source[0];
+    }
 
+    return AdditiveExpression(source);
 }
 
 function MultiplicativeExpression(source) {
@@ -87,7 +127,7 @@ function MultiplicativeExpression(source) {
         source.unshift(node);
         return MultiplicativeExpression(source);
     }
-    if(source[0].type === ExpressionLabel.MultiplicativeExpression){
+    if (source[0].type === ExpressionLabel.MultiplicativeExpression) {
         return source[0];
     }
 
