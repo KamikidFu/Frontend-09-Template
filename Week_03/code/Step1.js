@@ -2,15 +2,15 @@ var regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
 
 var dictionary = ["Number", "Whitespace", "LineTerminator", "*", "/", "+", "-"];
 
-function tokenize(source){
+function tokenize(source) {
     var result = null;
-    while(true){
+    while (true) {
         result = regexp.exec(source);
 
-        if(!result) break;
+        if (!result) break;
 
-        for(var i=1;i<=dictionary.length;i++){
-            if(result[i]){
+        for (var i = 1; i <= dictionary.length; i++) {
+            if (result[i]) {
                 console.log(dictionary[i - 1]);
             }
         }
