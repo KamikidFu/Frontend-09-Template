@@ -25,6 +25,9 @@ function* tokenize(source) {
         token.value = result[0];
         yield token; // When return a serializable object, use yield
     }
+    yield {
+        type: 'EOF'
+    }
 }
 
 for (let token of tokenize("1024 + 10 * 25")) {
