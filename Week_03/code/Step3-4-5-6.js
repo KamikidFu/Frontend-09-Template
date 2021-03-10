@@ -38,14 +38,24 @@ let ExpressionLabel = {
     MultiplicativeExpression: "MultiplicativeExpression"
 }
 
-for (let token of tokenize("10 * 25 / 2")) {
+for (let token of tokenize("1 + 2 * 5 + 3")) {
     if (token.type !== "Whitespace" && token.type !== "LineTerminator") {
         source.push(token);
     }
 }
 
 function Expression(tokens) {
-
+    if (source[0].type === ExpressionLabel.AdditiveExpression
+        && source[1] && source[1].type === "EOF") {
+        let node = {
+            type: ExpressionLabel.Expression,
+            children: [source.shift(), source.shift()]
+        }
+        source.unshift(node);
+        return node;
+    }
+    AdditiveExpression(source);
+    return Expression(source);
 }
 
 function AdditiveExpression(source) {
@@ -88,7 +98,7 @@ function AdditiveExpression(source) {
     if (source[0].type === ExpressionLabel.AdditiveExpression) {
         return source[0];
     }
-
+    MultiplicativeExpression(source);
     return AdditiveExpression(source);
 }
 
@@ -134,4 +144,4 @@ function MultiplicativeExpression(source) {
     return MultiplicativeExpression(source);
 }
 
-console.log(MultiplicativeExpression(source));
+console.log(Expression(source));
